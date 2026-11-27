@@ -1,0 +1,96 @@
+<bingyx-page-header [title]="t('games.title')" [subtitle]="t('games.subtitle')">
+  <p-button routerLink="/games/new" icon="pi pi-plus" [label]="t('games.new')" />
+</bingyx-page-header>
+
+@if (service.isLoading() && service.games().length === 0) {
+  <p class="text-[var(--p-text-muted-color)]">{{ t('common.loading') }}</p>
+} @else if (service.games().length === 0) {
+  <bingyx-empty-state [title]="t('games.emptyTitle')" [message]="t('games.emptyMessage')">
+    <p-button
+      routerLink="/games/new"
+      icon="pi pi-plus"
+      [label]="t('games.createFirst')"
+      styleClass="mt-3"
+    />
+  </bingyx-empty-state>
+} @else {
+  <ul class="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-5 p-0">
+    @for (game of service.games(); track game.id) {
+      <li
+        class="flex flex-col gap-4 rounded-2xl border border-[var(--bx-line)] bg-white p-6"
+        [class.opacity-80]="game.status === 'finished'"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <bingyx-status-tag [status]="game.status" />
+          @if (game.scheduledAt) {
+            <span class="text-[13px] text-[var(--p-text-muted-color)]">
+              {{ formatDayTime(game.scheduledAt) }}
+            </span>
+          }
+        </div>
+
+        <h2 class="font-display m-0 text-2xl font-semibold">{{ game.name }}</h2>
+
+        <p class="m-0 flex flex-wrap gap-x-5 gap-y-1 text-sm text-[var(--p-text-muted-color)]">
+          @switch (game.status) {
+            @case ('finished') {
+              <span>{{ t('games.stats.cards', { count: game.participantCount }) }}</span>
+              <span>{{ t('games.stats.winners', { count: game.winCount }) }}</span>
+            }
+            @case ('draft') {
+              <span>{{ t('games.stats.prizes', { count: game.prizeCount }) }}</span>
+              <span>{{ t('games.stats.code', { code: game.code }) }}</span>
+            }
+            @default {
+              <span>{{ t('games.stats.cards', { count: game.participantCount }) }}</span>
+              @if (game.status === 'open') {
+                <span>{{ t('games.stats.prizes', { count: game.prizeCount }) }}</span>
+              } @else {
+                <span>{{ t('games.stats.drawn', { count: game.drawnCount }) }}</span>
+              }
+            }
+          }
+        </p>
+
+        <div class="mt-auto flex flex-wrap items-center gap-2">
+          @if (editable(game)) {
+            <p-button
+              [routerLink]="['/games', game.id, 'edit']"
+              [label]="game.status === 'draft' ? t('games.continue') : t('games.edit')"
+              [outlined]="game.status === 'open'"
+              class="flex-1"
+              styleClass="w-full"
+            />
+          }
+          @if (game.status !== 'draft' && game.status !== 'finished') {
+            <p-button
+              [routerLink]="['/games', game.id, 'control']"
+              icon="pi pi-play"
+              [label]="t('games.control')"
+              class="flex-1"
+              styleClass="w-full"
+            />
+          }
+          @if (invitable(game)) {
+            <p-button
+              [routerLink]="['/games', game.id, 'invites']"
+              icon="pi pi-users"
+              [ariaLabel]="t('games.invite')"
+              severity="secondary"
+              [outlined]="true"
+            />
+          }
+          @if (deletable(game)) {
+            <p-button
+              icon="pi pi-trash"
+              severity="secondary"
+              [text]="true"
+              [ariaLabel]="t('games.deleteNamed', { name: game.name })"
+              (onClick)="remove(game)"
+            />
+          }
+        </div>
+      </li>
+    }
+  </ul>
+}

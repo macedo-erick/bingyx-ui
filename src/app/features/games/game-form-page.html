@@ -1,0 +1,162 @@
+<a
+  routerLink="/games"
+  class="mb-4 inline-flex items-center gap-1.5 text-sm text-[var(--bx-pine)] no-underline"
+>
+  <i class="pi pi-chevron-left text-xs" aria-hidden="true"></i>
+  {{ t('nav.games') }}
+</a>
+
+<div class="mb-6 flex flex-wrap items-center gap-3">
+  <h1 class="font-display m-0 text-4xl font-extrabold text-[var(--bx-pine)]">
+    {{ isNew() ? t('gameForm.newTitle') : model().name || t('gameForm.editTitle') }}
+  </h1>
+  @if (!isNew()) {
+    <bingyx-status-tag [status]="status()" />
+  }
+</div>
+
+@if (locked()) {
+  <p class="mb-6 rounded-xl bg-[var(--bx-neutral)] px-4 py-3 text-sm" role="status">
+    {{ t('gameForm.locked') }}
+  </p>
+}
+
+<form class="flex flex-wrap items-start gap-6" novalidate (submit)="$event.preventDefault()">
+  <div class="flex min-w-0 flex-[999_1_640px] flex-col gap-6">
+    <section class="flex flex-col gap-5 rounded-2xl border border-[var(--bx-line)] bg-white p-6">
+      <h2 class="m-0 text-lg font-bold">{{ t('gameForm.details') }}</h2>
+
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label for="name" class="text-sm font-semibold">{{ t('gameForm.name') }}</label>
+          <input
+            pInputText
+            id="name"
+            autocomplete="off"
+            [placeholder]="t('gameForm.namePlaceholder')"
+            [formField]="f.name"
+          />
+          @if (errorFor(f.name); as error) {
+            <p class="m-0 text-sm text-[var(--p-primary-700)]">{{ error }}</p>
+          }
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="scheduledAt" class="text-sm font-semibold">
+            {{ t('gameForm.scheduledAt') }}
+          </label>
+          <input pInputText id="scheduledAt" type="datetime-local" [formField]="f.scheduledAt" />
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+        <span
+          class="inline-flex items-center rounded-lg bg-[var(--bx-pine-soft)] px-3 py-2 text-[13px] font-semibold text-[var(--bx-pine)]"
+        >
+          {{ t('gameForm.format') }}
+        </span>
+        <label class="inline-flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            class="size-[18px] accent-[var(--p-primary-color)]"
+            [formField]="f.freeCenter"
+          />
+          {{ t('gameForm.freeCenter') }}
+        </label>
+        <label class="inline-flex items-center gap-2 text-sm">
+          {{ t('gameForm.claimWindow') }}
+          <input pInputText type="number" class="w-20" [formField]="f.claimWindowSeconds" />
+          {{ t('gameForm.seconds') }}
+        </label>
+      </div>
+      @if (errorFor(f.claimWindowSeconds); as error) {
+        <p class="m-0 text-sm text-[var(--p-primary-700)]">{{ t('gameForm.claimWindowRange') }}</p>
+      }
+    </section>
+
+    <section class="flex flex-col rounded-2xl border border-[var(--bx-line)] bg-white p-6">
+      <h2 class="m-0 text-lg font-bold">{{ t('gameForm.prizes') }}</h2>
+      <p class="mt-1 mb-3 text-sm text-[var(--p-text-muted-color)]">
+        {{ t('gameForm.prizesHint') }}
+      </p>
+
+      @for (prize of f.prizes; track $index) {
+        <div class="flex flex-wrap items-center gap-5 border-t border-[var(--bx-neutral)] py-4">
+          <bingyx-prize-pattern [type]="prize.type().value()" />
+          <label class="inline-flex min-w-40 items-center gap-2.5 text-[15px] font-semibold">
+            <input
+              type="checkbox"
+              class="size-5 accent-[var(--bx-pine)]"
+              [formField]="prize.enabled"
+            />
+            {{ t('prizes.' + prize.type().value()) }}
+          </label>
+          <label class="inline-flex items-center gap-2 text-sm text-[var(--p-text-muted-color)]">
+            {{ t('gameForm.quantity') }}
+            <input pInputText type="number" class="w-20" [formField]="prize.quantity" />
+          </label>
+          <label
+            class="inline-flex min-w-0 flex-[1_1_220px] items-center gap-2 text-sm text-[var(--p-text-muted-color)]"
+          >
+            {{ t('gameForm.prize') }}
+            <input
+              pInputText
+              class="min-w-0 flex-1"
+              [placeholder]="t('gameForm.prizePlaceholder')"
+              [formField]="prize.description"
+            />
+          </label>
+        </div>
+      }
+    </section>
+  </div>
+
+  <aside
+    class="flex flex-[1_1_300px] flex-col gap-4 rounded-2xl bg-[var(--bx-pine)] p-6 text-[var(--bx-cream)]"
+  >
+    <h2 class="font-display m-0 text-[22px] font-semibold">{{ t('gameForm.summary') }}</h2>
+    @if (enabledPrizes().length === 0) {
+      <p class="m-0 text-sm text-[var(--bx-gold)]">{{ t('gameForm.noPrizes') }}</p>
+    } @else {
+      <ul class="m-0 flex list-none flex-col gap-2.5 p-0 text-sm text-[var(--bx-pine-ink)]">
+        @for (prize of enabledPrizes(); track prize.type) {
+          <li>
+            {{ prize.quantity }} × {{ t('prizes.' + prize.type) }}
+            @if (prize.description.trim()) {
+              · {{ prize.description.trim() }}
+            }
+          </li>
+        }
+      </ul>
+    }
+    <p class="m-0 text-[13px] leading-relaxed text-[var(--bx-pine-ink)]">
+      {{ endsOnFullCard() ? t('gameForm.endsOnFull') : t('gameForm.endsOnLast') }}
+      {{ t('gameForm.tieRule') }}
+    </p>
+
+    @if (!locked()) {
+      <div class="mt-2 flex flex-col gap-2.5">
+        @if (status() === 'draft') {
+          <p-button
+            [label]="t('gameForm.saveAndOpen')"
+            [loading]="saving() === 'open'"
+            [disabled]="saving() !== null"
+            styleClass="w-full"
+            (onClick)="save(true)"
+          />
+        }
+        <button
+          type="button"
+          class="secondary-on-pine"
+          [class.filled]="status() !== 'draft'"
+          [disabled]="saving() !== null"
+          (click)="save(false)"
+        >
+          @if (saving() === 'draft') {
+            <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+          }
+          {{ status() === 'draft' ? t('gameForm.saveDraft') : t('gameForm.save') }}
+        </button>
+      </div>
+    }
+  </aside>
+</form>

@@ -1,0 +1,175 @@
+<a
+  routerLink="/games"
+  class="mb-4 inline-flex items-center gap-1.5 text-sm text-[var(--bx-pine)] no-underline"
+>
+  <i class="pi pi-chevron-left text-xs" aria-hidden="true"></i>
+  {{ t('nav.games') }}
+</a>
+
+@if (game.value(); as game) {
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex flex-col gap-1">
+      <h1 class="font-display m-0 text-4xl font-extrabold text-[var(--bx-pine)]">
+        {{ t('invite.title') }}
+      </h1>
+      <p class="m-0 flex items-center gap-2 text-[15px] text-[var(--p-text-muted-color)]">
+        {{ game.name }} <bingyx-status-tag [status]="game.status" />
+      </p>
+    </div>
+    @if (game.status !== 'draft' && game.status !== 'finished') {
+      <p-button
+        [routerLink]="['/games', game.id, 'control']"
+        icon="pi pi-play"
+        [label]="t('games.control')"
+      />
+    }
+  </div>
+
+  <div class="mb-6 flex gap-1 border-b border-[var(--bx-line)]" role="tablist">
+    <button
+      type="button"
+      role="tab"
+      aria-selected="true"
+      class="-mb-px border-b-[3px] border-[var(--p-primary-color)] px-4 py-3 font-bold"
+    >
+      {{ t('invite.linkTab') }}
+    </button>
+    <button
+      type="button"
+      role="tab"
+      aria-selected="false"
+      disabled
+      class="-mb-px inline-flex items-center gap-2 border-b-[3px] border-transparent px-4 py-3 text-[var(--bx-neutral-ink)]"
+    >
+      {{ t('invite.emailTab') }}
+      <span class="rounded-full bg-[var(--bx-neutral)] px-2 py-0.5 text-[11px] font-bold">
+        {{ t('invite.soon') }}
+      </span>
+    </button>
+  </div>
+
+  <div class="flex flex-wrap items-start gap-6">
+    <section
+      class="flex min-w-0 flex-[999_1_560px] flex-wrap items-center gap-7 rounded-2xl border border-[var(--bx-line)] bg-white p-7"
+    >
+      @if (game.status === 'draft') {
+        <div class="flex flex-col items-start gap-3">
+          <p class="m-0">{{ t('invite.draft') }}</p>
+          <p-button
+            [label]="t('gameForm.saveAndOpen')"
+            [loading]="busy()"
+            (onClick)="openRegistration()"
+          />
+        </div>
+      } @else {
+        <div class="flex flex-col items-center gap-2">
+          @if (qrCode(); as qr) {
+            <img
+              [src]="qr"
+              width="184"
+              height="184"
+              class="rounded-xl border border-[var(--bx-line)]"
+              [alt]="t('invite.qrAlt')"
+            />
+            <a
+              [href]="qr"
+              [download]="'bingyx-' + game.code + '.png'"
+              class="text-[13px] font-semibold"
+            >
+              {{ t('invite.downloadQr') }}
+            </a>
+          }
+        </div>
+
+        <div class="flex min-w-0 flex-[1_1_280px] flex-col gap-4">
+          <div class="flex flex-col gap-2">
+            <label for="inviteLink" class="text-sm font-semibold">{{ t('invite.link') }}</label>
+            <div class="flex gap-2">
+              <input
+                pInputText
+                id="inviteLink"
+                readonly
+                class="min-w-0 flex-1 font-mono"
+                [value]="link()"
+              />
+              <p-button icon="pi pi-copy" [label]="t('invite.copy')" (onClick)="copy()" />
+            </div>
+          </div>
+          <p class="m-0 text-sm leading-relaxed text-[var(--p-text-muted-color)]">
+            {{ t('invite.howItWorks', { code: game.code }) }}
+          </p>
+          @if (canToggle()) {
+            <div
+              class="flex items-center justify-between gap-3 rounded-xl bg-[var(--bx-pine-soft)] px-4 py-3.5"
+            >
+              <span class="flex flex-col gap-0.5">
+                <strong class="text-sm text-[var(--bx-pine)]">
+                  {{ game.registrationOpen ? t('invite.openTitle') : t('invite.closedTitle') }}
+                </strong>
+                <span class="text-[13px] text-[var(--bx-pine)]">
+                  {{ game.registrationOpen ? t('invite.openHint') : t('invite.closedHint') }}
+                </span>
+              </span>
+              <p-toggleswitch
+                [ngModel]="game.registrationOpen"
+                (ngModelChange)="setRegistration($event)"
+                [ariaLabel]="t('invite.toggle')"
+              />
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <aside
+      class="flex flex-[1_1_320px] flex-col gap-4 rounded-2xl border border-[var(--bx-line)] bg-white p-6"
+    >
+      <div class="flex items-baseline justify-between">
+        <h2 class="m-0 text-lg font-bold">{{ t('invite.participants') }}</h2>
+        <span class="text-sm text-[var(--p-text-muted-color)]">
+          {{ t('games.stats.cards', { count: roster.value().length }) }}
+        </span>
+      </div>
+
+      @if (game.status !== 'finished') {
+        <button
+          type="button"
+          class="flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-dashed border-[var(--p-primary-color)] bg-transparent p-3 text-sm font-semibold text-[var(--p-primary-color)] disabled:opacity-60"
+          [disabled]="busy()"
+          (click)="play()"
+        >
+          <i class="pi pi-plus text-xs" aria-hidden="true"></i>
+          {{ t('invite.play') }}
+        </button>
+      }
+
+      @if (roster.value().length === 0) {
+        <p class="m-0 text-sm text-[var(--p-text-muted-color)]">{{ t('invite.nobody') }}</p>
+      } @else {
+        <ul class="m-0 flex list-none flex-col p-0" aria-live="polite">
+          @for (person of roster.value(); track person.cardNumber) {
+            <li class="flex items-center gap-3 border-t border-[var(--bx-neutral)] py-2.5 text-sm">
+              <span
+                class="rounded-md bg-[var(--p-primary-50)] px-2 py-0.5 font-mono text-[13px] font-bold text-[var(--p-primary-800)]"
+              >
+                {{ cardLabel(person.cardNumber) }}
+              </span>
+              <span class="flex-1">
+                {{ person.firstName }} {{ person.lastName }}
+                @if (person.isOrganiser) {
+                  <span class="text-[var(--p-text-muted-color)]"
+                    >({{ t('invite.organiser') }})</span
+                  >
+                }
+              </span>
+            </li>
+          }
+        </ul>
+      }
+    </aside>
+  </div>
+} @else if (game.error()) {
+  <p>{{ t('errors.notFound') }}</p>
+} @else {
+  <p class="text-[var(--p-text-muted-color)]">{{ t('common.loading') }}</p>
+}

@@ -1,0 +1,196 @@
+<div class="screen">
+  <bingyx-snowfall [count]="50" />
+  <bingyx-confetti [burst]="announcement()" />
+  <header class="top">
+    <div class="brand">
+      <bingyx-logo size="clamp(18px, 2vw, 30px)" />
+      @if (live(); as live) {
+        <h1 class="font-display">{{ live.name }}</h1>
+      }
+    </div>
+    <div class="top-actions">
+      @if (live()?.registrationOpen) {
+        <span class="join">
+          {{ t('screen.joinAt') }} <strong>{{ joinLabel() }}</strong>
+        </span>
+      }
+      @if (voice.supported) {
+        <button
+          type="button"
+          class="sound"
+          [class.off]="!voice.enabled()"
+          [attr.aria-pressed]="voice.enabled()"
+          (click)="toggleSound()"
+        >
+          <i
+            class="pi"
+            [class.pi-volume-up]="voice.enabled()"
+            [class.pi-volume-off]="!voice.enabled()"
+            aria-hidden="true"
+          ></i>
+          {{ voice.enabled() ? t('screen.soundOn') : t('screen.soundOff') }}
+        </button>
+      }
+    </div>
+  </header>
+
+  @if (channel.notFound()) {
+    <main class="center-message">
+      <h2 class="font-display">{{ t('screen.notFound') }}</h2>
+    </main>
+  } @else if (live(); as live) {
+    @switch (live.status) {
+      @case ('open') {
+        <main class="waiting">
+          @if (qrCode(); as qr) {
+            <img [src]="qr" [alt]="t('invite.qrAlt')" class="qr" />
+          }
+          <div class="waiting-copy">
+            <span class="eyebrow">{{ t('screen.soon') }}</span>
+            <h2 class="font-display">{{ t('screen.scanToJoin') }}</h2>
+            <p class="join-big">{{ joinLabel() }}</p>
+            <p class="count">{{ t('screen.joined', { count: live.participantCount }) }}</p>
+          </div>
+        </main>
+      }
+      @case ('finished') {
+        <main class="results">
+          <div class="results-head">
+            <span class="eyebrow">{{ t('screen.over') }}</span>
+            <h2 class="font-display">{{ t('screen.merryChristmas') }}</h2>
+            <span class="stats">
+              {{
+                t('screen.finalStats', { balls: live.draws.length, cards: live.participantCount })
+              }}
+            </span>
+          </div>
+          <ul class="winner-cards">
+            @for (winner of live.winners; track $index) {
+              <li>
+                <span class="prize">{{ t('prizes.' + winner.prizeType) }}</span>
+                <span class="font-display name">{{ winner.name }}</span>
+                <span class="meta">
+                  {{ t('play.card', { number: cardLabel(winner.cardNumber) }) }} ·
+                  {{ t('screen.atBall', { seq: winner.atSeq }) }}
+                  @if (winner.tieBreak) {
+                    · {{ t('control.tieBreak') }}
+                  }
+                </span>
+                @if (winner.description) {
+                  <span class="font-display gift">{{ winner.description }}</span>
+                }
+              </li>
+            } @empty {
+              <li class="none">{{ t('screen.noWinners') }}</li>
+            }
+          </ul>
+        </main>
+      }
+      @default {
+        <main class="board">
+          <section class="ball-panel" [attr.aria-label]="t('play.lastBall')">
+            <span class="eyebrow">{{ t('screen.ballOf', { count: live.draws.length }) }}</span>
+            @for (ball of lastBallKeyed(); track ball) {
+              <div class="big-ball enter" aria-live="assertive">
+                <span class="letter">{{ letterOf(ball) }}</span>
+                <span class="number">{{ ball }}</span>
+              </div>
+            } @empty {
+              <div class="big-ball"><span class="letter">★</span></div>
+            }
+            <div class="recent">
+              <span class="eyebrow">{{ t('screen.previous') }}</span>
+              <div class="recent-balls">
+                @for (previous of recentBalls(); track previous) {
+                  <span>{{ letterOf(previous) }}{{ previous }}</span>
+                }
+              </div>
+            </div>
+          </section>
+
+          <section class="middle">
+            <bingyx-ball-board [draws]="live.draws" tone="night" [label]="t('control.drawn')" />
+            <div class="prizes">
+              @for (prize of live.prizes; track prize.type) {
+                <div class="prize-card" [class.done]="prize.won >= prize.quantity">
+                  <span class="eyebrow">{{ t('prizes.' + prize.type) }}</span>
+                  @if (prize.description) {
+                    <span class="font-display">{{ prize.description }}</span>
+                  }
+                  <span class="left">
+                    {{ t('screen.left', { count: prize.quantity - prize.won }) }}
+                  </span>
+                </div>
+              }
+            </div>
+          </section>
+
+          <section class="ranking" [attr.aria-label]="t('screen.ranking')">
+            <h2 class="font-display">{{ t('screen.ranking') }}</h2>
+            <ol>
+              @for (entry of ranking(); track entry.cardNumber; let i = $index) {
+                <li [class.hot]="entry.missing === 0">
+                  <span class="pos">{{ i + 1 }}</span>
+                  <span class="card">{{ cardLabel(entry.cardNumber) }}</span>
+                  <span class="name">{{ entry.name }}</span>
+                  <span class="missing">
+                    {{
+                      t('screen.missing', {
+                        count: entry.missing,
+                        prize: t('prizes.' + entry.prizeType),
+                      })
+                    }}
+                  </span>
+                </li>
+              }
+            </ol>
+          </section>
+        </main>
+      }
+    }
+
+    @if (live.window; as window) {
+      <div class="overlay checking" role="alert">
+        <span class="font-display title">{{ t('screen.claimed') }}</span>
+        <span class="subtitle">{{ t('screen.checking') }}</span>
+        <ul class="claimants">
+          @for (claimant of window.claimants; track $index) {
+            <li>
+              <span class="card">{{ cardLabel(claimant.cardNumber) }}</span>
+              {{ claimant.name }} · {{ t('prizes.' + claimant.prizeType) }}
+            </li>
+          }
+        </ul>
+        <span class="countdown">{{ secondsLeft() }}</span>
+      </div>
+    } @else if (announcement(); as announcement) {
+      <button type="button" class="overlay announcement" (click)="dismiss()" role="alert">
+        <span class="font-display bingo">BINGO!</span>
+        @for (winner of announcement.winners; track $index) {
+          <span class="winner">
+            <span class="prize-tag">{{ t('prizes.' + winner.prizeType) }}</span>
+            <span class="font-display name">{{ winner.name }}</span>
+            <span class="card">{{ t('play.card', { number: cardLabel(winner.cardNumber) }) }}</span>
+            @if (winner.description) {
+              <span class="font-display gift">{{ winner.description }}</span>
+            }
+          </span>
+        }
+        @for (tie of announcement.tieBreakAmong; track tie.prizeType) {
+          <span class="tie">
+            {{
+              t('screen.tieBreak', {
+                count: tie.cardNumbers.length,
+                prize: t('prizes.' + tie.prizeType),
+              })
+            }}
+          </span>
+        }
+      </button>
+    }
+  } @else {
+    <main class="center-message">
+      <span class="eyebrow">{{ t('common.loading') }}</span>
+    </main>
+  }
+</div>

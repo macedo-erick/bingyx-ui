@@ -1,0 +1,146 @@
+<bingyx-confetti [burst]="celebrate()" />
+<div class="mx-auto flex min-h-dvh max-w-[480px] flex-col text-[var(--bx-cream)]">
+  @if (state.value(); as state) {
+    <header class="flex items-center justify-between gap-3 px-5 pt-5 pb-3">
+      <div class="flex min-w-0 flex-col gap-0.5">
+        <span class="font-display truncate text-lg font-semibold">{{ state.game.name }}</span>
+        <span class="text-[13px] text-[var(--bx-pine-ink)]">
+          {{ state.player.firstName }} {{ state.player.lastName }}
+        </span>
+      </div>
+      @if (inPlay()) {
+        <span
+          class="inline-flex items-center gap-1.5 rounded-full bg-[var(--p-primary-color)] px-2.5 py-1 text-xs font-bold text-white"
+        >
+          <span class="size-[7px] rounded-full bg-white" aria-hidden="true"></span>
+          {{ t('status.running') }}
+        </span>
+      }
+    </header>
+
+    @if (lastBall(); as ball) {
+      <section
+        class="mx-5 flex items-center gap-4 rounded-[18px] bg-[var(--bx-pine)] px-4 py-3.5"
+        [attr.aria-label]="t('play.lastBall')"
+        aria-live="polite"
+      >
+        @for (key of lastBallKeyed(); track key) {
+          <div
+            class="ball-enter flex size-[76px] flex-none flex-col items-center justify-center rounded-full bg-[var(--bx-cream)] text-[var(--p-primary-color)] shadow-[0_0_0_4px_var(--p-primary-color)]"
+          >
+            <span class="text-sm leading-none font-extrabold">{{ letterOf(ball) }}</span>
+            <span class="text-[34px] leading-none font-extrabold">{{ ball }}</span>
+          </div>
+        }
+        <div class="flex min-w-0 flex-col gap-2">
+          <span class="text-xs font-semibold tracking-wider text-[var(--bx-pine-ink)] uppercase">
+            {{ t('play.ballCount', { count: state.live.draws.length }) }}
+          </span>
+          <div class="flex gap-1.5">
+            @for (previous of recentBalls(); track previous) {
+              <span
+                class="grid size-9 place-items-center rounded-full bg-[var(--bx-pine-line)] text-xs font-bold"
+              >
+                {{ letterOf(previous) }}{{ previous }}
+              </span>
+            }
+          </div>
+        </div>
+      </section>
+    } @else {
+      <section
+        class="mx-5 flex items-center gap-4 rounded-[18px] bg-[var(--bx-pine)] px-4 py-3.5"
+        role="status"
+      >
+        <i class="pi pi-clock text-2xl text-[var(--bx-gold)]" aria-hidden="true"></i>
+        <span class="text-sm text-[var(--bx-pine-ink)]">
+          {{ state.live.status === 'finished' ? t('play.finished') : t('play.waiting') }}
+        </span>
+      </section>
+    }
+
+    <section class="mx-5 mt-4 rounded-[20px] bg-[var(--bx-cream)] p-3.5 text-[var(--p-text-color)]">
+      <div class="flex items-baseline justify-between px-1 pb-2.5">
+        <span class="text-[13px] text-[var(--p-text-muted-color)]">
+          {{ state.live.status === 'finished' ? t('play.yourCard') : t('play.tapToMark') }}
+        </span>
+        <span class="font-mono text-[15px] font-extrabold text-[var(--p-primary-800)]">
+          {{ t('play.card', { number: cardLabel(state.card.number) }) }}
+        </span>
+      </div>
+      <bingyx-bingo-card
+        [grid]="state.card.grid"
+        [marked]="marked()"
+        [interactive]="state.live.status !== 'finished'"
+        [label]="t('play.card', { number: cardLabel(state.card.number) })"
+        [freeLabel]="t('play.free')"
+        (markToggle)="toggle($event)"
+      />
+    </section>
+
+    @if (state.me.rank; as rank) {
+      <div class="mx-5 mt-3.5 flex items-center justify-between text-sm text-[var(--bx-pine-ink)]">
+        <span>{{ t('play.rankLabel') }}</span>
+        <strong class="text-base text-[var(--bx-gold)]">
+          {{
+            t('play.rank', {
+              position: rank.position,
+              missing: rank.missing,
+              prize: t('prizes.' + rank.prizeType),
+            })
+          }}
+        </strong>
+      </div>
+    }
+
+    <div class="mx-5 mt-auto flex flex-col gap-2.5 pt-4 pb-6">
+      @for (prize of state.me.wins; track prize) {
+        <div
+          class="rounded-xl bg-[var(--bx-gold)] px-3.5 py-3 text-center text-sm font-bold text-[var(--bx-pine-deep)]"
+          role="status"
+        >
+          {{ t('play.won', { prize: t('prizes.' + prize) }) }}
+        </div>
+      }
+      @if (state.me.pending.length > 0 || feedback() === 'sent') {
+        <div
+          class="rounded-xl bg-[var(--bx-gold-soft)] px-3.5 py-3 text-center text-sm font-semibold text-[var(--bx-gold-ink)]"
+          role="status"
+        >
+          {{ t('play.checking') }}
+        </div>
+      } @else if (feedback() === 'rejected') {
+        <div
+          class="rounded-xl bg-[var(--bx-cream)] px-3.5 py-3 text-center text-sm font-semibold text-[var(--p-text-color)]"
+          role="status"
+        >
+          {{ t('play.notYet') }}
+        </div>
+      } @else if (claimable().length > 0 && inPlay()) {
+        <span class="text-center text-[13px] font-semibold text-[var(--bx-gold)]">
+          {{ t('play.ready') }}
+        </span>
+      }
+
+      @if (inPlay()) {
+        <button
+          type="button"
+          class="bingo font-display"
+          [class.ready]="claimable().length > 0"
+          [disabled]="claiming()"
+          (click)="claim()"
+        >
+          BINGO!
+        </button>
+      }
+    </div>
+  } @else if (state.isLoading()) {
+    <p class="p-8 text-center text-[var(--bx-pine-ink)]">{{ t('common.loading') }}</p>
+  } @else {
+    <div class="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
+      <bingyx-logo />
+      <h1 class="font-display m-0 text-2xl font-extrabold">{{ t('play.noCardTitle') }}</h1>
+      <p class="m-0 text-[var(--bx-pine-ink)]">{{ t('play.noCardMessage') }}</p>
+    </div>
+  }
+</div>

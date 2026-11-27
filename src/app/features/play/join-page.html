@@ -1,0 +1,92 @@
+<bingyx-snowfall [count]="30" />
+<div class="relative z-[1] mx-auto flex min-h-dvh max-w-[480px] flex-col text-[var(--bx-cream)]">
+  <div class="flex flex-col items-center gap-3 px-7 pt-14 pb-7 text-center">
+    <bingyx-logo size="1.25rem" />
+
+    @if (invitation.value(); as invitation) {
+      <span class="mt-4 text-sm text-[var(--bx-pine-ink)]">{{ t('join.invitedTo') }}</span>
+      <h1 class="font-display m-0 text-[34px] leading-tight font-extrabold">
+        {{ invitation.name }}
+      </h1>
+      @if (invitation.scheduledAt) {
+        <span class="text-sm text-[var(--bx-pine-ink)]">
+          {{ formatDayTime(invitation.scheduledAt) }}
+        </span>
+      }
+      <div class="mt-2 flex flex-wrap justify-center gap-1.5">
+        @for (prize of invitation.prizes; track prize.type) {
+          <span class="rounded-full bg-[var(--bx-pine)] px-2.5 py-1 text-xs font-semibold">
+            {{ prize.quantity }} × {{ t('prizes.' + prize.type) }}
+          </span>
+        }
+      </div>
+    }
+  </div>
+
+  <div
+    class="mt-auto flex flex-col gap-4 rounded-t-[28px] bg-[var(--bx-cream)] px-6 pt-7 pb-9 text-[var(--p-text-color)]"
+  >
+    @if (invitation.isLoading()) {
+      <p class="m-0 text-center text-[var(--p-text-muted-color)]">{{ t('common.loading') }}</p>
+    } @else if (invitation.error() || !invitation.value()) {
+      <h2 class="m-0 text-xl font-bold">{{ t('join.notFoundTitle') }}</h2>
+      <p class="m-0 text-[var(--p-text-muted-color)]">{{ t('join.notFoundMessage') }}</p>
+    } @else if (!open()) {
+      <h2 class="m-0 text-xl font-bold">
+        {{
+          invitation.value()?.status === 'finished'
+            ? t('join.finishedTitle')
+            : t('join.closedTitle')
+        }}
+      </h2>
+      <p class="m-0 text-[var(--p-text-muted-color)]">
+        {{
+          invitation.value()?.status === 'finished'
+            ? t('join.finishedMessage')
+            : t('join.closedMessage')
+        }}
+      </p>
+    } @else {
+      <form class="flex flex-col gap-4" novalidate (submit)="$event.preventDefault(); submit()">
+        <h2 class="m-0 text-xl font-bold">{{ t('join.whatsYourName') }}</h2>
+        <div class="flex flex-col gap-1.5">
+          <label for="firstName" class="text-sm font-semibold">{{ t('join.firstName') }}</label>
+          <input
+            pInputText
+            id="firstName"
+            autocomplete="given-name"
+            [placeholder]="t('join.firstNamePlaceholder')"
+            class="!rounded-xl !p-3.5"
+            [formField]="f.firstName"
+          />
+          @if (errorFor(f.firstName); as error) {
+            <p class="m-0 text-sm text-[var(--p-primary-700)]">{{ error }}</p>
+          }
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label for="lastName" class="text-sm font-semibold">{{ t('join.lastName') }}</label>
+          <input
+            pInputText
+            id="lastName"
+            autocomplete="family-name"
+            [placeholder]="t('join.lastNamePlaceholder')"
+            class="!rounded-xl !p-3.5"
+            [formField]="f.lastName"
+          />
+          @if (errorFor(f.lastName); as error) {
+            <p class="m-0 text-sm text-[var(--p-primary-700)]">{{ error }}</p>
+          }
+        </div>
+        <p-button
+          type="submit"
+          [label]="t('join.submit')"
+          [loading]="joining()"
+          styleClass="w-full !min-h-[54px] !rounded-[14px] !text-[17px] !font-bold"
+        />
+        <p class="m-0 text-center text-[13px] text-[var(--p-text-muted-color)]">
+          {{ t('join.noAccount') }}
+        </p>
+      </form>
+    }
+  </div>
+</div>

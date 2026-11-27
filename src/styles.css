@@ -1,0 +1,86 @@
+@layer theme, base, primeng, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@import 'primeicons/primeicons.css';
+
+@plugin 'tailwindcss-primeui';
+
+@custom-variant dark (&:where(.app-dark, .app-dark *));
+
+:root {
+  color-scheme: light;
+
+  --bx-font-display: 'Fraunces', Georgia, serif;
+  --bx-font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --bx-pine: #14532d;
+  --bx-pine-deep: #0b2318;
+  --bx-pine-soft: #e3f0e6;
+  --bx-pine-ink: #d6e6da;
+  --bx-pine-line: #3f7356;
+  --bx-pine-900: #133a29;
+  --bx-pine-800: #1f5a3e;
+  --bx-pine-300: #7fa08c;
+  --bx-gold: #e8b931;
+  --bx-gold-ink: #7a5a0a;
+  --bx-gold-soft: #fff3d1;
+  --bx-cream: #fff8ee;
+  --bx-line: #eadfcb;
+  --bx-neutral: #f1ece2;
+  --bx-neutral-ink: #5c5a4e;
+}
+
+.app-dark {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--bx-font-body);
+  background: var(--bx-cream);
+  color: var(--p-text-color);
+}
+
+.font-display {
+  font-family: var(--bx-font-display);
+}
+
+:focus-visible {
+  outline: 2px solid var(--p-primary-color);
+  outline-offset: 2px;
+}
+
+/* Signal Forms marks a required field invalid before anyone has typed in it; an empty field
+   keeps its normal border and the message under it carries the error once touched. */
+.p-inputtext.p-invalid:placeholder-shown {
+  border-color: var(--p-inputtext-border-color);
+}
+
+body.p-overflow-hidden {
+  padding-right: 0;
+}
+
+.p-dialog {
+  max-width: calc(100vw - 2rem);
+}
+
+@media (pointer: coarse) {
+  :root {
+    --p-form-field-font-size: 16px;
+    --p-form-field-sm-font-size: 16px;
+  }
+
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='color'], [type='file']),
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}

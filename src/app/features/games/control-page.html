@@ -1,0 +1,218 @@
+<a
+  routerLink="/games"
+  class="mb-4 inline-flex items-center gap-1.5 text-sm text-[var(--bx-pine)] no-underline"
+>
+  <i class="pi pi-chevron-left text-xs" aria-hidden="true"></i>
+  {{ t('nav.games') }}
+</a>
+
+@if (view.value(); as live) {
+  <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex flex-wrap items-center gap-3">
+      <h1 class="font-display m-0 text-[32px] font-extrabold text-[var(--bx-pine)]">
+        {{ live.name }}
+      </h1>
+      <bingyx-status-tag [status]="live.status" />
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="text-sm text-[var(--p-text-muted-color)]">
+        {{ t('games.stats.cards', { count: live.participantCount }) }}
+      </span>
+      <a
+        [href]="screenLink()"
+        target="_blank"
+        rel="noopener"
+        class="inline-flex items-center gap-2 rounded-[10px] border border-[var(--bx-line)] bg-white px-3.5 py-2.5 text-sm font-semibold text-[var(--bx-pine)] no-underline"
+      >
+        <i class="pi pi-desktop" aria-hidden="true"></i>
+        {{ t('control.openScreen') }}
+      </a>
+      <a
+        [routerLink]="['/games', live.id, 'invites']"
+        class="inline-flex items-center gap-2 rounded-[10px] border border-[var(--bx-line)] bg-white px-3.5 py-2.5 text-sm font-semibold text-[var(--bx-pine)] no-underline"
+      >
+        <i class="pi pi-users" aria-hidden="true"></i>
+        {{ t('games.invite') }}
+      </a>
+    </div>
+  </div>
+
+  @if (live.window; as window) {
+    <div
+      class="mb-5 flex flex-wrap items-center gap-4 rounded-[14px] border border-[var(--bx-gold)] bg-[var(--bx-gold-soft)] px-5 py-4"
+      role="status"
+    >
+      <span class="font-display text-[22px] font-extrabold text-[var(--bx-gold-ink)]">
+        {{ t('control.claimed') }}
+      </span>
+      <span class="flex-1 text-sm text-[var(--bx-gold-ink)]">
+        @for (claimant of window.claimants; track $index; let last = $last) {
+          {{ cardLabel(claimant.cardNumber) }} {{ claimant.name }} ·
+          {{ t('prizes.' + claimant.prizeType) }}{{ last ? '' : ', ' }}
+        }
+      </span>
+      <span class="font-mono text-[22px] font-extrabold text-[var(--bx-gold-ink)]">
+        0:{{ (secondsLeft() ?? 0).toString().padStart(2, '0') }}
+      </span>
+    </div>
+  }
+
+  <div class="flex flex-wrap items-stretch gap-5">
+    <section
+      class="flex flex-[1_1_320px] flex-col items-center gap-[18px] rounded-[20px] bg-[var(--bx-pine)] p-7 text-[var(--bx-cream)]"
+    >
+      <span class="text-[13px] font-semibold tracking-[1.5px] text-[var(--bx-pine-ink)] uppercase">
+        @if (lastBall()) {
+          {{ t('control.ballOf', { count: live.draws.length }) }}
+        } @else {
+          {{ t('control.noBallYet') }}
+        }
+      </span>
+      <div
+        class="flex size-[180px] flex-col items-center justify-center rounded-full bg-[var(--bx-cream)] text-[var(--p-primary-color)] shadow-[0_0_0_8px_var(--p-primary-color)]"
+        aria-live="polite"
+      >
+        @if (lastBall(); as ball) {
+          <span class="text-[28px] leading-none font-extrabold">{{ letterOf(ball) }}</span>
+          <span class="text-[76px] leading-none font-extrabold tabular-nums">{{ ball }}</span>
+        } @else {
+          <i class="pi pi-star text-5xl text-[var(--bx-gold-ink)]" aria-hidden="true"></i>
+        }
+      </div>
+      <div class="flex min-h-10 gap-2" [attr.aria-label]="t('control.previous')">
+        @for (previous of recentBalls(); track previous) {
+          <span
+            class="grid size-10 place-items-center rounded-full bg-[var(--bx-pine-line)] text-sm font-bold"
+          >
+            {{ letterOf(previous) }}{{ previous }}
+          </span>
+        }
+      </div>
+
+      @switch (live.status) {
+        @case ('open') {
+          <button
+            type="button"
+            class="draw-button"
+            [disabled]="busy() || live.participantCount === 0"
+            (click)="start()"
+          >
+            <i class="pi pi-play" aria-hidden="true"></i>
+            {{ t('control.start') }}
+          </button>
+          @if (live.participantCount === 0) {
+            <span class="text-[13px] text-[var(--bx-pine-ink)]">{{ t('control.nobodyYet') }}</span>
+          }
+        }
+        @case ('running') {
+          <button type="button" class="draw-button" [disabled]="busy()" (click)="draw()">
+            <i class="pi pi-sync" aria-hidden="true"></i>
+            {{ t('control.draw') }}
+          </button>
+        }
+        @case ('checking') {
+          <button type="button" class="draw-button" disabled>
+            <i class="pi pi-hourglass" aria-hidden="true"></i>
+            {{ t('control.waitingCheck') }}
+          </button>
+        }
+        @case ('finished') {
+          <span class="font-display text-xl font-semibold text-[var(--bx-gold)]">
+            {{ t('control.finished') }}
+          </span>
+        }
+      }
+    </section>
+
+    <section
+      class="flex min-w-0 flex-[999_1_560px] flex-col gap-3 rounded-[20px] border border-[var(--bx-line)] bg-white p-6"
+    >
+      <h2 class="m-0 text-base font-bold">{{ t('control.drawn') }}</h2>
+      <bingyx-ball-board [draws]="live.draws" [label]="t('control.drawn')" />
+    </section>
+  </div>
+
+  <div class="mt-5 flex flex-wrap gap-5">
+    <section
+      class="flex flex-[1_1_360px] flex-col gap-1 rounded-[20px] border border-[var(--bx-line)] bg-white p-6"
+    >
+      <h2 class="m-0 mb-2 text-base font-bold">{{ t('gameForm.prizes') }}</h2>
+      @for (prize of live.prizes; track prize.type) {
+        <div class="flex items-center gap-3 border-t border-[var(--bx-neutral)] py-2.5 text-sm">
+          <strong class="min-w-28">{{ t('prizes.' + prize.type) }}</strong>
+          <span class="flex-1 text-[var(--p-text-muted-color)]">{{ prize.description }}</span>
+          <span class="font-bold text-[var(--bx-pine)]">
+            {{ t('control.wonOf', { won: prize.won, quantity: prize.quantity }) }}
+          </span>
+        </div>
+      }
+      @if (live.winners.length > 0) {
+        <h3 class="m-0 mt-4 mb-1 text-sm font-bold">{{ t('control.winners') }}</h3>
+        @for (winner of live.winners; track $index) {
+          <div class="flex items-center gap-3 border-t border-[var(--bx-neutral)] py-2 text-sm">
+            <span class="font-mono font-bold text-[var(--p-primary-800)]">
+              {{ cardLabel(winner.cardNumber) }}
+            </span>
+            <span class="flex-1">{{ winner.name }}</span>
+            <span class="text-[var(--p-text-muted-color)]">
+              {{ t('prizes.' + winner.prizeType) }}
+              @if (winner.tieBreak) {
+                · {{ t('control.tieBreak') }}
+              }
+            </span>
+          </div>
+        }
+      }
+    </section>
+
+    <section
+      class="flex flex-[1_1_360px] flex-col gap-1 rounded-[20px] border border-[var(--bx-line)] bg-white p-6"
+    >
+      <h2 class="m-0 mb-2 text-base font-bold">{{ t('control.claims') }}</h2>
+      @if (live.claims.length === 0) {
+        <p class="m-0 text-sm text-[var(--p-text-muted-color)]">{{ t('control.noClaims') }}</p>
+      }
+      @for (entry of live.claims; track $index) {
+        <div class="flex items-center gap-3 border-t border-[var(--bx-neutral)] py-2.5 text-sm">
+          <span class="font-mono font-bold text-[var(--p-primary-800)]">
+            {{ cardLabel(entry.cardNumber) }}
+          </span>
+          <span class="flex-1">
+            {{ entry.name }}
+            @if (entry.prizeType) {
+              · {{ t('prizes.' + entry.prizeType) }}
+            }
+          </span>
+          @if (entry.valid) {
+            <span
+              class="rounded-full bg-[var(--bx-pine-soft)] px-2.5 py-0.5 text-xs font-bold text-[var(--bx-pine)]"
+            >
+              {{ t('control.valid') }}
+            </span>
+          } @else {
+            <span
+              class="rounded-full bg-[var(--bx-neutral)] px-2.5 py-0.5 text-xs font-bold text-[var(--bx-neutral-ink)]"
+            >
+              {{ t('control.notYet') }}
+            </span>
+          }
+        </div>
+      }
+      @if (live.status === 'open' || live.status === 'running') {
+        <div class="mt-auto flex justify-end pt-3">
+          <p-button
+            [label]="t('control.finishGame')"
+            severity="danger"
+            [outlined]="true"
+            [disabled]="busy()"
+            (onClick)="finish()"
+          />
+        </div>
+      }
+    </section>
+  </div>
+} @else if (view.error()) {
+  <p>{{ t('errors.notFound') }}</p>
+} @else {
+  <p class="text-[var(--p-text-muted-color)]">{{ t('common.loading') }}</p>
+}

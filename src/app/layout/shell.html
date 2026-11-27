@@ -1,0 +1,59 @@
+<header class="bg-[var(--bx-pine)] text-[var(--bx-cream)]">
+  <div class="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-4 px-6 py-4">
+    <a routerLink="/games" class="rounded text-[var(--bx-cream)] no-underline">
+      <bingyx-logo />
+    </a>
+
+    <nav class="flex items-center gap-5 text-sm" [attr.aria-label]="t('common.mainNavigation')">
+      <a
+        routerLink="/games"
+        routerLinkActive="border-[var(--bx-gold)]"
+        class="border-b-2 border-transparent pb-0.5 font-semibold text-[var(--bx-cream)] no-underline"
+      >
+        {{ t('nav.games') }}
+      </a>
+
+      <button
+        type="button"
+        class="flex items-center gap-2 rounded-full p-1 text-[var(--bx-pine-ink)] hover:bg-white/10"
+        (click)="userMenu.toggle($event)"
+        [attr.aria-label]="t('common.accountMenu', { name: auth.displayName() })"
+      >
+        <span
+          class="grid size-8 place-items-center rounded-full bg-[var(--bx-gold)] text-[13px] font-bold text-[var(--bx-pine)]"
+          aria-hidden="true"
+        >
+          {{ auth.initials() }}
+        </span>
+        <span class="hidden sm:inline">{{ auth.displayName() }}</span>
+        <i class="pi pi-angle-down text-xs" aria-hidden="true"></i>
+      </button>
+
+      <p-popover #userMenu>
+        <div class="flex w-max max-w-72 min-w-56 flex-col">
+          <div class="border-b border-[var(--p-content-border-color)] px-3 pt-1 pb-2">
+            <p class="m-0 truncate text-sm font-medium">{{ auth.displayName() }}</p>
+            <p class="m-0 truncate text-xs text-[var(--p-text-muted-color)]">
+              {{ auth.email() }}
+            </p>
+          </div>
+          <p-button
+            [label]="t('common.signOut')"
+            icon="pi pi-sign-out"
+            severity="secondary"
+            [text]="true"
+            styleClass="justify-start w-full text-left"
+            (onClick)="userMenu.hide(); auth.logout()"
+          />
+        </div>
+      </p-popover>
+    </nav>
+  </div>
+</header>
+
+<main class="mx-auto w-full max-w-[1200px] flex-1 px-6 pt-10 pb-16">
+  <router-outlet />
+</main>
+
+<p-toast [breakpoints]="{ '640px': { width: '90vw', right: '5vw', left: '5vw' } }" />
+<p-confirmdialog />
