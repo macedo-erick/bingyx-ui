@@ -48,3 +48,7 @@ Thumbs.db
 # Scratch screenshots used while reporting UI bugs
 /img*.png
 /bugs/
+
+# ElevenLabs key used only by scripts/generate-voice.mts
+.env.elevenlabs
+/voice-samples/

@@ -59,7 +59,7 @@
               [label]="game.status === 'draft' ? t('games.continue') : t('games.edit')"
               [outlined]="game.status === 'open'"
               class="flex-1"
-              styleClass="w-full"
+              styleClass="w-full whitespace-nowrap"
             />
           }
           @if (game.status !== 'draft' && game.status !== 'finished') {
@@ -68,7 +68,7 @@
               icon="pi pi-play"
               [label]="t('games.control')"
               class="flex-1"
-              styleClass="w-full"
+              styleClass="w-full whitespace-nowrap"
             />
           }
           @if (invitable(game)) {

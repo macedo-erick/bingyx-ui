@@ -153,7 +153,7 @@ describe('ScreenPage', () => {
 
     events.next({ kind: 'ball', seq: 5, ball: 12 });
 
-    expect(voice.say).toHaveBeenCalledWith('Bê... doze.', true);
+    expect(voice.say).toHaveBeenCalledWith({ clip: 'ball-12', text: 'Bê... doze.' }, true);
   });
 
   it('calls out the winners when the check settles', () => {
@@ -174,7 +174,10 @@ describe('ScreenPage', () => {
       tieBreakAmong: [],
     });
 
-    expect(voice.say).toHaveBeenCalledWith('Bingo! linha para Ana, cartela catorze!', true);
+    expect(voice.say).toHaveBeenCalledWith(
+      [expect.objectContaining({ clip: 'win-line', after: 'Ana, cartela catorze!' })],
+      true,
+    );
   });
 
   it('asks for a click to turn the sound on, as browsers require', () => {

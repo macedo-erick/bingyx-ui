@@ -376,7 +376,7 @@
   padding: calc(var(--u) * 1.5) calc(var(--u) * 1.8);
   border-radius: calc(var(--u) * 1.5);
   background: var(--bx-cream);
-  color: var(--p-text-color);
+  color: var(--bx-pine-deep);
 }
 
 .winner-cards .prize {
@@ -394,7 +394,7 @@
 
 .winner-cards .meta {
   font-size: calc(var(--u) * 1);
-  color: var(--p-text-muted-color);
+  color: var(--bx-neutral-ink);
 }
 
 .winner-cards .gift {

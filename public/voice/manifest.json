@@ -1,0 +1,323 @@
+{
+  "sound-on": [
+    "sound-on-1.mp3"
+  ],
+  "claim": [
+    "claim-1.mp3"
+  ],
+  "win-line": [
+    "win-line-1.mp3"
+  ],
+  "win-column": [
+    "win-column-1.mp3"
+  ],
+  "win-diagonal": [
+    "win-diagonal-1.mp3"
+  ],
+  "win-full": [
+    "win-full-1.mp3"
+  ],
+  "finished": [
+    "finished-1.mp3"
+  ],
+  "ball-1": [
+    "ball-1-1.mp3",
+    "ball-1-2.mp3"
+  ],
+  "ball-2": [
+    "ball-2-1.mp3",
+    "ball-2-2.mp3"
+  ],
+  "ball-3": [
+    "ball-3-1.mp3",
+    "ball-3-2.mp3"
+  ],
+  "ball-4": [
+    "ball-4-1.mp3",
+    "ball-4-2.mp3"
+  ],
+  "ball-5": [
+    "ball-5-1.mp3",
+    "ball-5-2.mp3"
+  ],
+  "ball-6": [
+    "ball-6-1.mp3",
+    "ball-6-2.mp3"
+  ],
+  "ball-7": [
+    "ball-7-1.mp3",
+    "ball-7-2.mp3"
+  ],
+  "ball-8": [
+    "ball-8-1.mp3",
+    "ball-8-2.mp3"
+  ],
+  "ball-9": [
+    "ball-9-1.mp3",
+    "ball-9-2.mp3"
+  ],
+  "ball-10": [
+    "ball-10-1.mp3",
+    "ball-10-2.mp3"
+  ],
+  "ball-11": [
+    "ball-11-1.mp3",
+    "ball-11-2.mp3"
+  ],
+  "ball-12": [
+    "ball-12-1.mp3",
+    "ball-12-2.mp3"
+  ],
+  "ball-13": [
+    "ball-13-1.mp3",
+    "ball-13-2.mp3"
+  ],
+  "ball-14": [
+    "ball-14-1.mp3",
+    "ball-14-2.mp3"
+  ],
+  "ball-15": [
+    "ball-15-1.mp3",
+    "ball-15-2.mp3"
+  ],
+  "ball-16": [
+    "ball-16-1.mp3",
+    "ball-16-2.mp3"
+  ],
+  "ball-17": [
+    "ball-17-1.mp3",
+    "ball-17-2.mp3"
+  ],
+  "ball-18": [
+    "ball-18-1.mp3",
+    "ball-18-2.mp3"
+  ],
+  "ball-19": [
+    "ball-19-1.mp3",
+    "ball-19-2.mp3"
+  ],
+  "ball-20": [
+    "ball-20-1.mp3",
+    "ball-20-2.mp3"
+  ],
+  "ball-21": [
+    "ball-21-1.mp3",
+    "ball-21-2.mp3"
+  ],
+  "ball-22": [
+    "ball-22-1.mp3",
+    "ball-22-2.mp3"
+  ],
+  "ball-23": [
+    "ball-23-1.mp3",
+    "ball-23-2.mp3"
+  ],
+  "ball-24": [
+    "ball-24-1.mp3",
+    "ball-24-2.mp3"
+  ],
+  "ball-25": [
+    "ball-25-1.mp3",
+    "ball-25-2.mp3"
+  ],
+  "ball-26": [
+    "ball-26-1.mp3",
+    "ball-26-2.mp3"
+  ],
+  "ball-27": [
+    "ball-27-1.mp3",
+    "ball-27-2.mp3"
+  ],
+  "ball-28": [
+    "ball-28-1.mp3",
+    "ball-28-2.mp3"
+  ],
+  "ball-29": [
+    "ball-29-1.mp3",
+    "ball-29-2.mp3"
+  ],
+  "ball-30": [
+    "ball-30-1.mp3",
+    "ball-30-2.mp3"
+  ],
+  "ball-31": [
+    "ball-31-1.mp3",
+    "ball-31-2.mp3"
+  ],
+  "ball-32": [
+    "ball-32-1.mp3",
+    "ball-32-2.mp3"
+  ],
+  "ball-33": [
+    "ball-33-1.mp3",
+    "ball-33-2.mp3"
+  ],
+  "ball-34": [
+    "ball-34-1.mp3",
+    "ball-34-2.mp3"
+  ],
+  "ball-35": [
+    "ball-35-1.mp3",
+    "ball-35-2.mp3"
+  ],
+  "ball-36": [
+    "ball-36-1.mp3",
+    "ball-36-2.mp3"
+  ],
+  "ball-37": [
+    "ball-37-1.mp3",
+    "ball-37-2.mp3"
+  ],
+  "ball-38": [
+    "ball-38-1.mp3",
+    "ball-38-2.mp3"
+  ],
+  "ball-39": [
+    "ball-39-1.mp3",
+    "ball-39-2.mp3"
+  ],
+  "ball-40": [
+    "ball-40-1.mp3",
+    "ball-40-2.mp3"
+  ],
+  "ball-41": [
+    "ball-41-1.mp3",
+    "ball-41-2.mp3"
+  ],
+  "ball-42": [
+    "ball-42-1.mp3",
+    "ball-42-2.mp3"
+  ],
+  "ball-43": [
+    "ball-43-1.mp3",
+    "ball-43-2.mp3"
+  ],
+  "ball-44": [
+    "ball-44-1.mp3",
+    "ball-44-2.mp3"
+  ],
+  "ball-45": [
+    "ball-45-1.mp3",
+    "ball-45-2.mp3"
+  ],
+  "ball-46": [
+    "ball-46-1.mp3",
+    "ball-46-2.mp3"
+  ],
+  "ball-47": [
+    "ball-47-1.mp3",
+    "ball-47-2.mp3"
+  ],
+  "ball-48": [
+    "ball-48-1.mp3",
+    "ball-48-2.mp3"
+  ],
+  "ball-49": [
+    "ball-49-1.mp3",
+    "ball-49-2.mp3"
+  ],
+  "ball-50": [
+    "ball-50-1.mp3",
+    "ball-50-2.mp3"
+  ],
+  "ball-51": [
+    "ball-51-1.mp3",
+    "ball-51-2.mp3"
+  ],
+  "ball-52": [
+    "ball-52-1.mp3",
+    "ball-52-2.mp3"
+  ],
+  "ball-53": [
+    "ball-53-1.mp3",
+    "ball-53-2.mp3"
+  ],
+  "ball-54": [
+    "ball-54-1.mp3",
+    "ball-54-2.mp3"
+  ],
+  "ball-55": [
+    "ball-55-1.mp3",
+    "ball-55-2.mp3"
+  ],
+  "ball-56": [
+    "ball-56-1.mp3",
+    "ball-56-2.mp3"
+  ],
+  "ball-57": [
+    "ball-57-1.mp3",
+    "ball-57-2.mp3"
+  ],
+  "ball-58": [
+    "ball-58-1.mp3",
+    "ball-58-2.mp3"
+  ],
+  "ball-59": [
+    "ball-59-1.mp3",
+    "ball-59-2.mp3"
+  ],
+  "ball-60": [
+    "ball-60-1.mp3",
+    "ball-60-2.mp3"
+  ],
+  "ball-61": [
+    "ball-61-1.mp3",
+    "ball-61-2.mp3"
+  ],
+  "ball-62": [
+    "ball-62-1.mp3",
+    "ball-62-2.mp3"
+  ],
+  "ball-63": [
+    "ball-63-1.mp3",
+    "ball-63-2.mp3"
+  ],
+  "ball-64": [
+    "ball-64-1.mp3",
+    "ball-64-2.mp3"
+  ],
+  "ball-65": [
+    "ball-65-1.mp3",
+    "ball-65-2.mp3"
+  ],
+  "ball-66": [
+    "ball-66-1.mp3",
+    "ball-66-2.mp3"
+  ],
+  "ball-67": [
+    "ball-67-1.mp3",
+    "ball-67-2.mp3"
+  ],
+  "ball-68": [
+    "ball-68-1.mp3",
+    "ball-68-2.mp3"
+  ],
+  "ball-69": [
+    "ball-69-1.mp3",
+    "ball-69-2.mp3"
+  ],
+  "ball-70": [
+    "ball-70-1.mp3",
+    "ball-70-2.mp3"
+  ],
+  "ball-71": [
+    "ball-71-1.mp3",
+    "ball-71-2.mp3"
+  ],
+  "ball-72": [
+    "ball-72-1.mp3",
+    "ball-72-2.mp3"
+  ],
+  "ball-73": [
+    "ball-73-1.mp3",
+    "ball-73-2.mp3"
+  ],
+  "ball-74": [
+    "ball-74-1.mp3",
+    "ball-74-2.mp3"
+  ],
+  "ball-75": [
+    "ball-75-1.mp3",
+    "ball-75-2.mp3"
+  ]
+}

@@ -5,3 +5,5 @@
 dist
 node_modules
 *.md
+.env.elevenlabs
+voice-samples
