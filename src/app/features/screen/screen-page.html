@@ -20,7 +20,8 @@
           class="sound"
           [class.off]="!voice.enabled()"
           [attr.aria-pressed]="voice.enabled()"
-          (click)="toggleSound()"
+          #soundButton
+          (click)="toggleSound(soundButton)"
         >
           <i
             class="pi"

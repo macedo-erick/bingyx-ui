@@ -106,7 +106,11 @@ export class ScreenPage {
     this.destroyRef.onDestroy(() => clearTimeout(hide));
   }
 
-  protected toggleSound(): void {
+  // A TV remote keeps focus on whatever it pressed, so the next OK would turn the sound back
+  // off; let go of the button once it has done its job.
+  protected toggleSound(button: HTMLElement): void {
+    button.blur();
+
     if (this.voice.enabled()) {
       this.voice.disable();
     } else {
