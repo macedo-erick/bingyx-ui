@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { Winner } from '../../shared/models/live';
-import { ballPhrase, numberInWords, winnersPhrase } from './phrases';
+import { ballPhrase, winnersPhrase } from './phrases';
+import { numberInWords } from './words';
 
 const winner = (overrides: Partial<Winner>): Winner => ({
   prizeType: 'line',
@@ -40,16 +41,20 @@ describe('numbers in words', () => {
 
 describe('what the caller says', () => {
   it('names the letter, then the number', () => {
-    expect(ballPhrase(12)).toBe('Bê... doze.');
-    expect(ballPhrase(31)).toBe('Ene... trinta e um.');
-    expect(ballPhrase(60)).toBe('Gê... sessenta.');
-    expect(ballPhrase(75)).toBe('Ó... setenta e cinco.');
+    expect(ballPhrase(12)).toEqual({ clip: 'ball-12', text: 'Bê... doze.' });
+    expect(ballPhrase(31).text).toBe('Ene... trinta e um.');
+    expect(ballPhrase(60).text).toBe('Gê... sessenta.');
+    expect(ballPhrase(75).text).toBe('Ó... setenta e cinco.');
   });
 
   it('announces a single winner by prize, name and card', () => {
-    expect(winnersPhrase([winner({ name: 'Maria Silva', cardNumber: 14 })])).toBe(
-      'Bingo! linha para Maria Silva, cartela catorze!',
-    );
+    expect(winnersPhrase([winner({ name: 'Maria Silva', cardNumber: 14 })])).toEqual([
+      {
+        clip: 'win-line',
+        text: 'Bingo! linha para Maria Silva, cartela catorze!',
+        after: 'Maria Silva, cartela catorze!',
+      },
+    ]);
   });
 
   it('joins winners of the same prize, and gives each prize its own sentence', () => {
@@ -59,8 +64,17 @@ describe('what the caller says', () => {
         winner({ name: 'Beatriz', cardNumber: 22 }),
         winner({ prizeType: 'column', name: 'Ana', cardNumber: 3 }),
       ]),
-    ).toBe(
-      'Bingo! linha para Carlos, cartela nove e Beatriz, cartela vinte e dois. coluna para Ana, cartela três!',
-    );
+    ).toEqual([
+      {
+        clip: 'win-line',
+        text: 'Bingo! linha para Carlos, cartela nove e Beatriz, cartela vinte e dois!',
+        after: 'Carlos, cartela nove e Beatriz, cartela vinte e dois!',
+      },
+      {
+        clip: 'win-column',
+        text: 'Bingo! coluna para Ana, cartela três!',
+        after: 'Ana, cartela três!',
+      },
+    ]);
   });
 });
