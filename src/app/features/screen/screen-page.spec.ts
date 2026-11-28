@@ -37,7 +37,8 @@ function render(snapshot: LiveSnapshot) {
 
   const voice = {
     supported: true,
-    enabled: signal(false),
+    enabled: signal(true),
+    on: signal(false),
     say: vi.fn(),
     enable: vi.fn(),
     disable: vi.fn(),
@@ -180,7 +181,7 @@ describe('ScreenPage', () => {
     );
   });
 
-  it('asks for a click to turn the sound on, as browsers require', () => {
+  it('offers to turn the sound on while the browser still blocks it', () => {
     const { element, voice, fixture } = render(running);
     const button = element.querySelector<HTMLButtonElement>('button.sound')!;
 
@@ -190,5 +191,20 @@ describe('ScreenPage', () => {
     fixture.detectChanges();
 
     expect(voice.enable).toHaveBeenCalled();
+  });
+
+  it('turns the sound off when it is playing', () => {
+    const { element, voice, fixture } = render(running);
+
+    voice.on.set(true);
+    fixture.detectChanges();
+
+    const button = element.querySelector<HTMLButtonElement>('button.sound')!;
+
+    expect(button.textContent).toContain('Som ativado');
+
+    button.click();
+
+    expect(voice.disable).toHaveBeenCalled();
   });
 });

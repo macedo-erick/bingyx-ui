@@ -18,18 +18,19 @@
         <button
           type="button"
           class="sound"
-          [class.off]="!voice.enabled()"
-          [attr.aria-pressed]="voice.enabled()"
+          [class.off]="!voice.on()"
+          [attr.aria-pressed]="voice.on()"
+          data-sound-toggle
           #soundButton
           (click)="toggleSound(soundButton)"
         >
           <i
             class="pi"
-            [class.pi-volume-up]="voice.enabled()"
-            [class.pi-volume-off]="!voice.enabled()"
+            [class.pi-volume-up]="voice.on()"
+            [class.pi-volume-off]="!voice.on()"
             aria-hidden="true"
           ></i>
-          {{ voice.enabled() ? t('screen.soundOn') : t('screen.soundOff') }}
+          {{ voice.on() ? t('screen.soundOn') : t('screen.soundOff') }}
         </button>
       }
     </div>

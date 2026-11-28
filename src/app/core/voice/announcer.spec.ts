@@ -16,11 +16,19 @@ class FakeUtterance {
 class FakeAudio {
   static last: FakeAudio | undefined;
   static broken = false;
+  // A browser that refuses to play anything before the page has had a gesture.
+  static locked = false;
 
   src = '';
   onended: (() => void) | null = null;
   onerror: (() => void) | null = null;
-  play = vi.fn(() => (FakeAudio.broken ? Promise.reject(new Error('blocked')) : Promise.resolve()));
+  play = vi.fn(() => {
+    if (FakeAudio.locked) {
+      return Promise.reject(new DOMException('no gesture yet', 'NotAllowedError'));
+    }
+
+    return FakeAudio.broken ? Promise.reject(new Error('broken')) : Promise.resolve();
+  });
   pause = vi.fn();
 
   constructor() {
@@ -28,7 +36,7 @@ class FakeAudio {
   }
 }
 
-async function withSpeech(clips: Record<string, string[]> = {}) {
+async function withSpeech(clips: Record<string, string[]> = {}, locked = false) {
   const synth = {
     speaking: false,
     pending: false,
@@ -45,6 +53,7 @@ async function withSpeech(clips: Record<string, string[]> = {}) {
 
   FakeAudio.last = undefined;
   FakeAudio.broken = false;
+  FakeAudio.locked = locked;
   vi.stubGlobal('speechSynthesis', synth);
   vi.stubGlobal('SpeechSynthesisUtterance', FakeUtterance);
   vi.stubGlobal('Audio', FakeAudio);
@@ -56,8 +65,9 @@ async function withSpeech(clips: Record<string, string[]> = {}) {
 
   const announcer = TestBed.inject(Announcer);
 
-  // Let the clip manifest arrive.
+  // Let the clip manifest arrive and the silent autoplay test settle.
   await new Promise((resolve) => setTimeout(resolve));
+  (FakeAudio.last as FakeAudio | undefined)?.play.mockClear();
 
   const spoken = () =>
     synth.speak.mock.calls
@@ -70,13 +80,61 @@ async function withSpeech(clips: Record<string, string[]> = {}) {
 describe('Announcer', () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it('stays silent until someone turns the sound on', async () => {
-    const { synth, announcer } = await withSpeech({ 'ball-12': ['ball-12-1.mp3'] });
+  it('calls the balls without any click when the browser allows autoplay', async () => {
+    const { announcer } = await withSpeech({ 'ball-12': ['ball-12-1.mp3'] });
 
-    announcer.say({ clip: 'ball-12', text: 'Bê... doze.' });
+    expect(announcer.on()).toBe(true);
 
+    announcer.say({ clip: 'ball-12', text: 'Bê... doze.' }, true);
+
+    expect(FakeAudio.last?.src).toContain('voice/ball-12-1.mp3');
+  });
+
+  it('stays silent while the browser blocks sound, until any key is pressed', async () => {
+    const { synth, announcer } = await withSpeech({ 'ball-12': ['ball-12-1.mp3'] }, true);
+
+    expect(announcer.enabled()).toBe(true);
+    expect(announcer.on()).toBe(false);
+
+    announcer.say({ clip: 'ball-12', text: 'Bê... doze.' }, true);
+
+    expect(FakeAudio.last?.play).not.toHaveBeenCalled();
     expect(synth.speak).not.toHaveBeenCalled();
-    expect(FakeAudio.last).toBeUndefined();
+
+    FakeAudio.locked = false;
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+    await new Promise((resolve) => setTimeout(resolve));
+
+    expect(announcer.on()).toBe(true);
+
+    announcer.say({ clip: 'ball-12', text: 'Bê... doze.' }, true);
+
+    expect(FakeAudio.last?.src).toContain('voice/ball-12-1.mp3');
+  });
+
+  it('leaves presses on the sound button to the button', async () => {
+    const { announcer } = await withSpeech({}, true);
+    const button = document.createElement('button');
+
+    button.setAttribute('data-sound-toggle', '');
+    document.body.append(button);
+    FakeAudio.locked = false;
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    await new Promise((resolve) => setTimeout(resolve));
+    button.remove();
+
+    expect(announcer.on()).toBe(false);
+  });
+
+  it('waits for a press again when the browser takes the sound back', async () => {
+    const { announcer } = await withSpeech({ 'ball-12': ['ball-12-1.mp3'] });
+
+    FakeAudio.locked = true;
+    announcer.say({ clip: 'ball-12', text: 'Bê... doze.' }, true);
+    await new Promise((resolve) => setTimeout(resolve));
+
+    expect(announcer.on()).toBe(false);
+    expect(announcer.enabled()).toBe(true);
   });
 
   it('plays the recorded take of a line when there is one', async () => {

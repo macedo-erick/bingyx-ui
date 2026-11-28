@@ -111,7 +111,7 @@ export class ScreenPage {
   protected toggleSound(button: HTMLElement): void {
     button.blur();
 
-    if (this.voice.enabled()) {
+    if (this.voice.on()) {
       this.voice.disable();
     } else {
       this.voice.enable();
